@@ -38,10 +38,10 @@ export default class Cell {
 
         this.estadoSig = this.estado;
 
-        if (suma < 2 || suma > 3) {
+        if (suma < this.sMin || suma > this.sMax) {
             this.estadoSig = 0;
         }
-        if (suma === 3) {
+        if (suma >= this.bMin && suma <= this.bMax) {
             this.estadoSig = 1;
         }
     }
