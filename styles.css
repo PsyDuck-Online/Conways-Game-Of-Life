@@ -1,0 +1,30 @@
+#canvas-scroll {
+    max-height: 550px;
+    height: 550px;
+    max-width: 600px;
+    width: 600px;
+    overflow: scroll;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.parametros {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.parametro {
+    margin: 10px;
+}
+
+
+.parametro input {
+    width: 60px;
+}
+
+.parametro #frame-rate {
+    width: 160px
+}

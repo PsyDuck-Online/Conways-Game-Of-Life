@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pruba Canvas</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <div id="canvas-scroll" class="left">
+            <canvas id="canvas" style="border: 1px solid blue;"></canvas>
+        </div>
+
+        <div class="right">
+            <fieldset class="parametros">
+
+                <legend>Parametros</legend>
+                <div class="parametros-section">
+                    <div class="parametro">
+                        <label for="canvas-size">Tamaño del tablero(celulas):</label>
+                        <input type="number" name="canvas-size" id="canvas-size">
+                    </div>
+
+                    <div class="parametro">
+                        <label for="cell-size">Tamaño celula(px):</label>
+                        <input type="number" name="cell-size" id="cell-size">
+                    </div>
+
+                    <div class="parametro">
+                        <label for="frame-rate">FPS:</label>
+                        <input type="range" name="frame-rate" id="frame-rate" value="30" min="10" max="60" step="5">
+                    </div>
+
+                    <div class="parametro">
+                        <label for="life-percent">Probabilidad de vida:</label>
+                        <input type="number" name="life-percent" id="life-percent" value="0.05" min="0" max="1"
+                            step=".01">
+                    </div>
+                </div>
+
+                <div id="parametros-section">
+                    <div class="parametro">
+                        <label for="s_min">S min:</label>
+                        <input type="number" name="s_min" id="s_min">
+                    </div>
+
+                    <div class="parametro">
+                        <label for="s_max">S max:</label>
+                        <input type="number" name="s_max" id="s_max">
+                    </div>
+
+                    <div class="parametro">
+                        <label for="b_min">B min:</label>
+                        <input type="number" name="b_min" id="b_min">
+                    </div>
+
+                    <div class="parametro">
+                        <label for="b_max">B max:</label>
+                        <input type="number" name="b_max" id="b_max">
+                    </div>
+                </div>
+
+            </fieldset>
+
+            <fieldset class="controles">
+                <legend>Controles</legend>
+                <button id="new-game">New Game</button>
+                <button id="update-rules">Update Rules</button>
+                <button id="pause-play">Pause/Play</button>
+                <button id="next-generation">Next Generation</button>
+            </fieldset>
+
+            <fieldset class="datos">
+                <legend>Datos</legend>
+                <p>Generacion: <span id="generacion"></span></p>
+                <p>Poblacion: <span id="poblacion"></span></p>
+            </fieldset>
+        </div>
+    </div>
+
+
+
+
+
+    <script type="module" src="./js/main.js"></script>
+</body>
+
+</html>
