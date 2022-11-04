@@ -19,11 +19,14 @@ const bMinElem = document.getElementById('b_min');
 const bMaxElem = document.getElementById('b_max');
 const colorVivoElem = document.getElementById('color-vivo');
 const colorMuertoElem = document.getElementById('color-muerto');
+const fileSelector = document.getElementById('file-selector');
 // Botones
 const newGameBtn = document.getElementById('new-game');
 const updateBtn = document.getElementById('update-rules');
 const playBtn = document.getElementById('pause-play');
 const nextGenBtn = document.getElementById('next-generation');
+const saveFileBtn = document.getElementById('save-file');
+const loadFileBtn = document.getElementById('load-file');
 // Datos
 const poblacionElem = document.getElementById('poblacion');
 const generacionElem = document.getElementById('generacion');
@@ -39,6 +42,40 @@ var poblacion, generacion;
 var tablero;
 var playing;
 var gameInterval;
+// Grafica
+const lineDiv = document.getElementById('chart');
+var layout = {
+    title: {
+        text: 'Densidad de poblacion',
+        font: {
+            family: 'Courier New, monospace',
+            size: 16
+        },
+        xref: 'paper',
+        x: 0.05
+    },
+    xaxis: {
+        title: {
+            text: 'Generacion',
+            font: {
+                family: 'Courier New, monospace',
+                size: 18                
+            }
+        },
+    },
+    yaxis: {
+        title: {
+            text: 'Poblacion',
+            font: {
+                family: 'Courier New, monospace',
+                size: 18
+            }
+        }
+    }
+
+}
+// Lector de archivos
+var reader = new FileReader;
 
 /*********************/
 /** EVENT LISTENERS **/
@@ -49,14 +86,15 @@ updateBtn.addEventListener('click', updateRules);
 playBtn.addEventListener('click', play);
 nextGenBtn.addEventListener('click', nextGen);
 canvas.addEventListener('mousedown', e => cambiarEstadoCelula(e));
-
 cellSizeElem.addEventListener('change', updateRules);
+saveFileBtn.addEventListener('click', saveFile);
+loadFileBtn.addEventListener('click', loadFile);
 /***************/
 /** FUNCIONES **/
 /***************/
-
+// -------------------------------
 // ---- Funciones principales ----
-
+// -------------------------------
 function loadGameOfLifeDefaultValues() {
     canvasSizeElem.value = 100;
     cellSizeElem.value = 5;
@@ -83,6 +121,7 @@ function newGame() {
     // Reiniciamos los datos 
     generacion = 0;
     poblacion = 0;
+    Plotly.purge(lineDiv);
     // Creamos el tablero
     tablero = new Array(canvasSize);
     for (let i = 0; i < canvasSize; i++) {
@@ -106,6 +145,13 @@ function newGame() {
     // Imprimimos los resultados
     imprimirTablero();
     imprimirDatos();
+    // Graficamos
+    Plotly.plot(lineDiv, [{
+        y: [poblacion],
+        x: [generacion],
+        name: 'Densidad de poblacion',
+        type: 'line'
+    }],layout);
 }
 
 function updateRules() {
@@ -170,6 +216,10 @@ function nextGen() {
 
     imprimirTablero();
     imprimirDatos();
+    Plotly.extendTraces(lineDiv, {
+        y: [[poblacion]],
+        x: [[generacion]]
+    }, [0]);
 }
 
 function cambiarEstadoCelula(e) {
@@ -186,9 +236,108 @@ function cambiarEstadoCelula(e) {
     imprimirTablero();
     imprimirDatos();
 }
+
+function saveFile() {
+    guardarArchivo(guardarJuego(), introducirNombreTxt());
+}
+
+function loadFile() {
+    let file = fileSelector.files[0];
+    reader.readAsText(file);
+
+    reader.onload = cargarPreset;
+}
+
+// -------------------------------
 // ---- Funciones Secundarias ----
+// -------------------------------
 
+function cargarPreset() {
+    let result = reader.result;
+    let lineas = result.split('\n');
 
+    for (let i = 0; i < lineas.length - 1; i++) {
+        if (i === 0) {
+            let cabecera = lineas[i].split(' ');
+
+            canvasSize = parseInt(cabecera[0]);
+            canvasSizeElem.value = canvasSize;
+
+            sMin = parseInt(cabecera[1]);
+            sMinElem.value = sMin;
+
+            sMax = parseInt(cabecera[2]);
+            sMaxElem.value = sMax;
+
+            bMin = parseInt(cabecera[3]);
+            bMinElem.value = bMin;
+
+            bMax = parseInt(cabecera[4]);
+            bMaxElem.value = bMax;
+
+            newGamePreset();
+        } else {
+            let linea = lineas[i].split('');
+            for (let x = 0; x < canvasSize; x++) {
+                poblacion += parseInt(linea[x]);
+                tablero[i - 1][x] = new Cell(x, i - 1, parseInt(linea[x]), sMin, sMax, bMin, bMax);
+            }
+        }
+    }
+
+    // Agregamos a los vecinos
+    for (let y = 0; y < canvasSize; y++) {
+        for (let x = 0; x < canvasSize; x++) {
+            tablero[y][x].agregarVecinos(tablero);
+        }
+    }
+    // Imprimimos los resultados
+    imprimirTablero();
+    imprimirDatos();
+    // Graficamos
+    Plotly.plot(lineDiv, [{
+        y: [poblacion],
+        x: [generacion],
+        type: 'line'
+    }]);
+}
+
+function guardarArchivo(contenido, nombre) {
+    if (nombre === './CANCEL')
+        return
+    const a = document.createElement('a');
+    const archivo = new Blob([contenido], { type: 'text/plain' });
+    const url = URL.createObjectURL(archivo);
+    a.href = url;
+    a.download = nombre;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function guardarJuego() {
+    let contenido;
+    // Agregamos las cabeceras del jueg(canvasSize, s min, s max, b min, b max)
+    contenido = canvasSize.toString() + " " + sMin.toString() + " " + sMax.toString() + " " + bMin.toString() + " " + bMax.toString() + "\n";
+    // Agregamos el contenido del tablero
+    for (let y = 0; y < canvasSize; y++) {
+        for (let x = 0; x < canvasSize; x++) {
+            contenido += tablero[y][x].estado.toString();
+        }
+        contenido += "\n";
+    }
+    return contenido
+}
+
+function introducirNombreTxt() {
+    let nombre = prompt('Introduce el nombre de la configuracion:');
+    if (nombre == null || nombre == '') {
+        nombre = './CANCEL';
+    } else {
+        nombre += ".txt";
+    }
+
+    return nombre;
+}
 
 function imprimirDatos() {
     poblacionElem.innerText = poblacion;
@@ -212,4 +361,20 @@ function getCursorPosition(event) {
     let y = Math.floor((event.clientY - rect.top) / cellSize);
 
     return [x, y];
+}
+
+function newGamePreset() {
+    // Paramos el juego si ya hay uno corriendo y reiniciamos los datos
+    if (playing === true) {
+        play();
+    }
+    // Reiniciamos los datos 
+    generacion = 0;
+    poblacion = 0;
+    Plotly.purge(lineDiv);
+    // Creamos el tablero
+    tablero = new Array(canvasSize);
+    for (let i = 0; i < canvasSize; i++) {
+        tablero[i] = new Array(canvasSize);
+    }
 }

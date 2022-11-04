@@ -28,3 +28,7 @@
 .parametro #frame-rate {
     width: 160px
 }
+
+.parametro #file-selector {
+    width: 100%;
+}

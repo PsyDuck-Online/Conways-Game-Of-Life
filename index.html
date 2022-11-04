@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conway's Game Of Life</title>
     <link rel="stylesheet" href="./styles.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
 <body>
@@ -51,6 +52,11 @@
                         <label for="color-muerto">Color Estado Vivo:</label>
                         <input type="color" name="color-muerto" id="color-muerto">
                     </div>
+
+                    <div class="parametro">
+                        <label for="file-selector">Cargar Preset:</label>
+                        <input type="file" name="file-selector" id="file-selector">
+                    </div>
                 </div>
 
                 <div id="parametros-section">
@@ -73,6 +79,8 @@
                         <label for="b_max">B max:</label>
                         <input type="number" name="b_max" id="b_max">
                     </div>
+
+                    
                 </div>
 
             </fieldset>
@@ -82,7 +90,9 @@
                 <button id="new-game">New Game</button>
                 <button id="update-rules">Update Rules</button>
                 <button id="pause-play">Pause/Play</button>
-                <button id="next-generation">Next Generation</button>                
+                <button id="next-generation">Next Generation</button> 
+                <button id="load-file">Load File</button>
+                <button id="save-file">Save File</button>
             </fieldset>
 
             <fieldset class="datos">
@@ -92,7 +102,8 @@
             </fieldset>
 
             <fieldset class="graficas">
-                <legend>Graficas</legend>
+                <legend>Grafica</legend>
+                <div id="chart"></div>
             </fieldset>
         </div>
     </div>
